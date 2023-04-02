@@ -1,4 +1,4 @@
-// ADC0  Library
+// ADC1  Library
 // Jason Losh
 
 //-----------------------------------------------------------------------------
@@ -10,7 +10,7 @@
 // System Clock:    -
 
 // Hardware configuration:
-// ADC0 SS3
+// ADC1 SS1
 
 //-----------------------------------------------------------------------------
 // Device includes, defines, and assembler directives
@@ -23,9 +23,9 @@
 // Subroutines
 //-----------------------------------------------------------------------------
 
-void initAdc0Ss3();
+void initAdc0Ss1();
 void setAdc0Ss3Log2AverageCount(uint8_t log2AverageCount);
-void setAdc0Ss3Mux(uint8_t input);
-int16_t readAdc0Ss3();
+void setAdc0Ss1Mux(uint8_t input);
+int16_t readAdc0Ss1();
 
 #endif
