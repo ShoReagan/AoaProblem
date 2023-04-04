@@ -43,7 +43,7 @@ void initAdc0Ss1()
     ADC0_CC_R = ADC_CC_CS_SYSPLL;                    // select PLL as the time base (not needed, since default value)
     ADC0_PC_R = ADC_PC_SR_1M;                        // select 1Msps rate
     ADC0_EMUX_R = ADC_EMUX_EM1_PROCESSOR;            // select SS1 bit in ADCPSSI as trigger
-    ADC0_SSMUX1_R = 0x000 | 0x010 | 0x200;           // set AIN pins as inputs 
+    ADC0_SSMUX1_R = 0x000 | 0x010 | 0x200;           // set AIN pins as inputs
     ADC0_SSCTL1_R = ADC_SSCTL1_END2 | ADC_SSCTL1_IE2;// mark third sample as the end
     ADC0_IM_R = ADC_IM_MASK1;                        // turn on interrupts for ss1
     ADC0_ACTSS_R |= ADC_ACTSS_ASEN1;                 // enable SS1 for operation
@@ -72,7 +72,6 @@ void setAdc0Ss1Mux(uint8_t input)
 // Request and read one sample from SS3
 int16_t readAdc0Ss1()
 {
-    ADC0_PSSI_R |= ADC_PSSI_SS1;                     // set start bit
     while (ADC0_ACTSS_R & ADC_ACTSS_BUSY);           // wait until SS3 is not busy
     while (ADC0_SSFSTAT1_R & ADC_SSFSTAT1_EMPTY);
     return ADC0_SSFIFO1_R;                           // get single result from the FIFO

@@ -24,7 +24,7 @@
 //-----------------------------------------------------------------------------
 
 void initAdc0Ss1();
-void setAdc0Ss3Log2AverageCount(uint8_t log2AverageCount);
+void setAdc0Ss1Log2AverageCount(uint8_t log2AverageCount);
 void setAdc0Ss1Mux(uint8_t input);
 int16_t readAdc0Ss1();
 
