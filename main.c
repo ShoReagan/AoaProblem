@@ -34,12 +34,20 @@ bool ain0Set = false;
 bool ain1Set = false;
 bool ain2Set = false;
 
-uint8_t ain0Count = 0;
-uint8_t ain1Count = 0;
-uint8_t ain2Count = 0;
+uint16_t ain0Count = 0;
+uint16_t ain1Count = 0;
+uint16_t ain2Count = 0;
+
+uint8_t max;
+uint8_t middle;
+uint8_t min;
+uint8_t section;
+uint16_t degree;
+
+uint8_t spike = 150;
 
 uint8_t index = 0;
-uint16_t count = 0;
+uint32_t count = 0;
 char buffer[24];
 
 void Adc0Ss1Isr()
@@ -71,12 +79,21 @@ void Adc0Ss1Isr()
             index = (index + 1) % 5;
         }
 
-        if(ain0Raw > ((ain0Average + 50)))
+        if(ain0Raw > ((ain0Average + spike)))
+        {
             ain0Set = true;
-        if(ain1Raw > ((ain1Average + 50)))
+            spike *= .75;
+        }
+        if(ain1Raw > ((ain1Average + spike)))
+        {
             ain1Set = true;
-        if(ain2Raw > ((ain2Average + 50)))
+            spike *= .75;
+        }
+        if(ain2Raw > ((ain2Average + spike)))
+        {
             ain2Set = true;
+            spike *= 75;
+        }
 
         if(ain0Set)
             ain0Count++;
@@ -85,9 +102,9 @@ void Adc0Ss1Isr()
         if(ain2Set)
             ain2Count++;
 
-        if(ain0Count > 1000 || ain1Count > 1000 || ain2Count > 1000)
+        if(ain0Count > 50 || ain1Count > 50 || ain2Count > 50)
         {
-            putsUart0("Overcount error\n");
+            putsUart0("Over count error\n");
 
             ain0Set = false;
             ain1Set = false;
@@ -97,12 +114,74 @@ void Adc0Ss1Isr()
             ain1Count = 0;
             ain2Count = 0;
 
-            count = 10000;
+            count = 100000;
+            spike = 150;
         }
 
         if(ain0Set && ain1Set && ain2Set)
         {
             snprintf(buffer, 24, "%d\n%d\n%d\n\n", ain0Count, ain1Count, ain2Count);
+            putsUart0(buffer);
+
+            max = 0;
+            min = 255;
+            degree = 0;
+
+            if(ain0Count >= ain1Count && ain0Count >= ain2Count)
+            {
+                max = ain0Count;
+                if(ain1Count <= ain2Count)
+                {
+                    min = ain1Count;
+                    middle = ain2Count;
+                    section = 2;
+                }
+                else
+                {
+                    min = ain2Count;
+                    middle = ain1Count;
+                    section = 1;
+                }
+            }
+            else if(ain1Count >= ain0Count && ain1Count >= ain2Count)
+            {
+                max = ain1Count;
+                if(ain0Count <= ain2Count)
+                {
+                    min = ain0Count;
+                    middle = ain2Count;
+                    section = 0;
+                }
+                else
+                {
+                    min = ain2Count;
+                    middle = ain0Count;
+                    section = 1;
+                }
+            }
+            else if(ain2Count >= ain0Count && ain2Count >= ain1Count)
+            {
+                max = ain2Count;
+                if(ain0Count <= ain1Count)
+                {
+                    min = ain0Count;
+                    middle = ain1Count;
+                    section = 0;
+                }
+                else
+                {
+                    min = ain1Count;
+                    middle = ain0Count;
+                    section = 2;
+                }
+            }
+
+            degree = (section * 120);
+            max -= min;
+            middle = max - middle;
+            degree += (max - middle) * 5;
+
+            snprintf(buffer, 24, "%d\n\n", degree);
             putsUart0(buffer);
 
             ain0Set = false;
@@ -113,7 +192,8 @@ void Adc0Ss1Isr()
             ain1Count = 0;
             ain2Count = 0;
 
-            count = 10000;
+            count = 100000;
+            spike = 150;
         }
     }
     else
