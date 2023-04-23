@@ -51,11 +51,14 @@ uint8_t value2;
 uint8_t section;
 uint8_t k;
 float degree;
+bool failOn = true;
+bool tdoaOn = false;
 
 uint16_t spike = temp;
 
 uint8_t index = 0;
 uint32_t backoff = 40;
+uint32_t timeConstant = 100;
 
 uint32_t holdoff = 0;
 uint32_t holdoffVal = 100000;
@@ -95,24 +98,14 @@ void Adc0Ss1Isr()
         if(ain2Set)
             ain2Count++;
 
-//        if(ain0Set || ain1Set || ain2Set)
-//        {
-//            snprintf(buffer, 64, "Mic 0: %d\nMic 1: %d\nMic 2: %d\n\n", ain0Raw, ain1Raw, ain2Raw);
-//            putsUart0(buffer);
-//
-//            snprintf(buffer, 64, "If 0: %d\nIf 1: %d\nIf 2: %d\n\n", ((ain0Average + spike)), ((ain1Average + spike)), ((ain2Average + spike)));
-//            putsUart0(buffer);
-//        }
-
         if(ain0Count > 40 || ain1Count > 40 || ain2Count > 40)
         {
-            putsUart0("Over count error\n");
-
-            snprintf(buffer, 64, "Count 0: %d\nCount 1: %d\nCount 2: %d\n\n", ain0Count, ain1Count, ain2Count);
-            putsUart0(buffer);
-
-//            snprintf(buffer, 64, "Avg 0: %d\nAvg 1: %d\nAvg 2: %d\n\n", ain0Average, ain1Average, ain2Average);
-//            putsUart0(buffer);
+            if(failOn)
+            {
+                putsUart0("Over count error\n");
+                snprintf(buffer, 64, "tdoa 0: %d\ntdoa 1: %d\ntdoa 2: %d\n\n", ain0Count, ain1Count, ain2Count);
+                putsUart0(buffer);
+            }
 
             ain0Set = false;
             ain1Set = false;
@@ -166,6 +159,11 @@ void Adc0Ss1Isr()
                 snprintf(buffer, 24, "aoa: %d\n\n", (int)degree);
                 putsUart0(buffer);
             }
+            if(tdoaOn)
+            {
+                snprintf(buffer, 64, "tdoa 0: %d\ntdoa 1: %d\ntdoa 2: %d\n\n", ain0Count, ain1Count, ain2Count);
+                putsUart0(buffer);
+            }
 
             setColor(degree);
 
@@ -181,7 +179,7 @@ void Adc0Ss1Isr()
             spike = temp;
         }
 
-        if(!ain0Set && !ain1Set && !ain2Set && !(wait % 100))
+        if(!ain0Set && !ain1Set && !ain2Set && !(wait % timeConstant))
         {
             ain0Sum -= ain0Buffer[index];
             ain1Sum -= ain1Buffer[index];
@@ -304,12 +302,20 @@ int main()
         }
         else if(isCommand(&data, "average", 0))
         {
-            snprintf(buffer, 64, "Mic 0 average: %d\nMic 1 average: %d\nMic 2 average: %d\n\n", ain0Average, ain1Average, ain2Average);
+            snprintf(buffer, 64, "Mic 0 average DAC: %d\nMic 1 average DAC: %d\nMic 2 average DAC: %d\n\n", ain0Average, ain1Average, ain2Average);
+            putsUart0(buffer);
+            snprintf(buffer, 64, "Mic 0 average SPL: %d\nMic 1 average SPL: %d\nMic 2 average SPL: %d\n\n", ((float)ain0Average * (3300.0 / 4096.0) * .1384) + 94, ((float)ain1Average * (3300.0 / 4096.0) * .1384) + 94, ((float)ain2Average * (3300.0 / 4096.0) * .1384) + 94);
             putsUart0(buffer);
         }
         else if(isCommand(&data, "tc", 1))
         {
-
+            if(data.fieldCount == 1)
+                timeConstant = getFieldInteger(&data, 1);
+            else
+            {
+                snprintf(buffer, 64, "Invalid backoff\nCurrent time constant: %d", timeConstant);
+                putsUart0(buffer);
+            }
         }
         else if(isCommand(&data, "backoff", 1))
         {
@@ -341,8 +347,24 @@ int main()
         }
         else if(isCommand(&data, "aoa", 0))
         {
-            snprintf(buffer, 64, "Angle: %d\n\n", (int)degree);
+            snprintf(buffer, 64, "aoa: %d\n\n", (int)degree);
             putsUart0(buffer);
+        }
+        else if(isCommand(&data, "tdoa", 1))
+        {
+            strTemp = getFieldString(&data, 2);
+            if(strcmp1(strTemp, "ON"))
+                tdoaOn = true;
+            else if(strcmp1(strTemp, "OFF"))
+                tdoaOn = false;
+        }
+        else if(isCommand(&data, "fail", 1))
+        {
+            strTemp = getFieldString(&data, 2);
+            if(strcmp1(strTemp, "ON"))
+                failOn = true;
+            else if(strcmp1(strTemp, "OFF"))
+                failOn = false;
         }
     }
 }
