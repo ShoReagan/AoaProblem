@@ -11,9 +11,11 @@ CMD_SRCS += \
 C_SRCS += \
 ../adc0.c \
 ../clock.c \
+../commands.c \
 ../gpio.c \
 ../main.c \
 ../nvic.c \
+../rgb_led.c \
 ../tm4c123gh6pm_startup_ccs.c \
 ../uart0.c \
 ../wait.c 
@@ -21,9 +23,11 @@ C_SRCS += \
 C_DEPS += \
 ./adc0.d \
 ./clock.d \
+./commands.d \
 ./gpio.d \
 ./main.d \
 ./nvic.d \
+./rgb_led.d \
 ./tm4c123gh6pm_startup_ccs.d \
 ./uart0.d \
 ./wait.d 
@@ -31,9 +35,11 @@ C_DEPS += \
 OBJS += \
 ./adc0.obj \
 ./clock.obj \
+./commands.obj \
 ./gpio.obj \
 ./main.obj \
 ./nvic.obj \
+./rgb_led.obj \
 ./tm4c123gh6pm_startup_ccs.obj \
 ./uart0.obj \
 ./wait.obj 
@@ -41,9 +47,11 @@ OBJS += \
 OBJS__QUOTED += \
 "adc0.obj" \
 "clock.obj" \
+"commands.obj" \
 "gpio.obj" \
 "main.obj" \
 "nvic.obj" \
+"rgb_led.obj" \
 "tm4c123gh6pm_startup_ccs.obj" \
 "uart0.obj" \
 "wait.obj" 
@@ -51,9 +59,11 @@ OBJS__QUOTED += \
 C_DEPS__QUOTED += \
 "adc0.d" \
 "clock.d" \
+"commands.d" \
 "gpio.d" \
 "main.d" \
 "nvic.d" \
+"rgb_led.d" \
 "tm4c123gh6pm_startup_ccs.d" \
 "uart0.d" \
 "wait.d" 
@@ -61,9 +71,11 @@ C_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../adc0.c" \
 "../clock.c" \
+"../commands.c" \
 "../gpio.c" \
 "../main.c" \
 "../nvic.c" \
+"../rgb_led.c" \
 "../tm4c123gh6pm_startup_ccs.c" \
 "../uart0.c" \
 "../wait.c" 

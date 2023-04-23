@@ -12,9 +12,11 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./adc0.obj" \
 "./clock.obj" \
+"./commands.obj" \
 "./gpio.obj" \
 "./main.obj" \
 "./nvic.obj" \
+"./rgb_led.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
 "./uart0.obj" \
 "./wait.obj" \
@@ -161,8 +163,8 @@ emb2Aoa.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "adc0.obj" "clock.obj" "gpio.obj" "main.obj" "nvic.obj" "tm4c123gh6pm_startup_ccs.obj" "uart0.obj" "wait.obj" 
-	-$(RM) "adc0.d" "clock.d" "gpio.d" "main.d" "nvic.d" "tm4c123gh6pm_startup_ccs.d" "uart0.d" "wait.d" 
+	-$(RM) "adc0.obj" "clock.obj" "commands.obj" "gpio.obj" "main.obj" "nvic.obj" "rgb_led.obj" "tm4c123gh6pm_startup_ccs.obj" "uart0.obj" "wait.obj" 
+	-$(RM) "adc0.d" "clock.d" "commands.d" "gpio.d" "main.d" "nvic.d" "rgb_led.d" "tm4c123gh6pm_startup_ccs.d" "uart0.d" "wait.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
