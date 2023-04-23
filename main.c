@@ -57,7 +57,7 @@ bool tdoaOn = false;
 uint16_t spike = temp;
 
 uint8_t index = 0;
-uint32_t backoff = 40;
+uint32_t backoff = 50;
 uint32_t timeConstant = 100;
 
 uint32_t holdoff = 0;
@@ -65,7 +65,7 @@ uint32_t holdoffVal = 100000;
 
 uint32_t count = 0;
 uint8_t wait = 0;
-char buffer[64];
+char buffer[72];
 
 void Adc0Ss1Isr()
 {
@@ -103,7 +103,7 @@ void Adc0Ss1Isr()
             if(failOn)
             {
                 putsUart0("Over count error\n");
-                snprintf(buffer, 64, "tdoa 0: %d\ntdoa 1: %d\ntdoa 2: %d\n\n", ain0Count, ain1Count, ain2Count);
+                snprintf(buffer, 72, "tdoa 0: %d\ntdoa 1: %d\ntdoa 2: %d\n\n", ain0Count, ain1Count, ain2Count);
                 putsUart0(buffer);
             }
 
@@ -121,9 +121,6 @@ void Adc0Ss1Isr()
 
         if(ain0Set && ain1Set && ain2Set)
         {
-            snprintf(buffer, 24, "%d\n%d\n%d\n\n", ain0Count, ain1Count, ain2Count);
-            putsUart0(buffer);
-
             if(ain0Count >= ain1Count && ain0Count >= ain2Count)
             {
                 value1 = ain0Count - ain1Count;
@@ -161,7 +158,7 @@ void Adc0Ss1Isr()
             }
             if(tdoaOn)
             {
-                snprintf(buffer, 64, "tdoa 0: %d\ntdoa 1: %d\ntdoa 2: %d\n\n", ain0Count, ain1Count, ain2Count);
+                snprintf(buffer, 72, "tdoa 0: %d\ntdoa 1: %d\ntdoa 2: %d\n\n", ain0Count, ain1Count, ain2Count);
                 putsUart0(buffer);
             }
 
@@ -302,44 +299,44 @@ int main()
         }
         else if(isCommand(&data, "average", 0))
         {
-            snprintf(buffer, 64, "Mic 0 average DAC: %d\nMic 1 average DAC: %d\nMic 2 average DAC: %d\n\n", ain0Average, ain1Average, ain2Average);
+            snprintf(buffer, 72, "Mic 0 average DAC: %d\nMic 1 average DAC: %d\nMic 2 average DAC: %d\n\n", ain0Average, ain1Average, ain2Average);
             putsUart0(buffer);
-            snprintf(buffer, 64, "Mic 0 average SPL: %d\nMic 1 average SPL: %d\nMic 2 average SPL: %d\n\n", ((float)ain0Average * (3300.0 / 4096.0) * .1384) + 94, ((float)ain1Average * (3300.0 / 4096.0) * .1384) + 94, ((float)ain2Average * (3300.0 / 4096.0) * .1384) + 94);
+            snprintf(buffer, 72, "Mic 0 average SPL: %d\nMic 1 average SPL: %d\nMic 2 average SPL: %d\n\n", (int)((float)ain0Average * (3300.0 / 4096.0) * .1384) + 94, (int)((float)ain1Average * (3300.0 / 4096.0) * .1384) + 94, (int)((float)ain2Average * (3300.0 / 4096.0) * .1384) + 94);
             putsUart0(buffer);
         }
-        else if(isCommand(&data, "tc", 1))
+        else if(isCommand(&data, "tc", 0))
         {
             if(data.fieldCount == 1)
                 timeConstant = getFieldInteger(&data, 1);
             else
             {
-                snprintf(buffer, 64, "Invalid backoff\nCurrent time constant: %d", timeConstant);
+                snprintf(buffer, 72, "Invalid time constant\nCurrent time constant: %d\n", timeConstant);
                 putsUart0(buffer);
             }
         }
-        else if(isCommand(&data, "backoff", 1))
+        else if(isCommand(&data, "backoff", 0))
         {
             if(data.fieldCount == 1)
                 backoff = getFieldInteger(&data, 1);
             else
             {
-                snprintf(buffer, 64, "Invalid backoff\nCurrent backoff: %d", backoff);
+                snprintf(buffer, 72, "Invalid backoff\nCurrent backoff: %d\n", backoff);
                 putsUart0(buffer);
             }
         }
-        else if(isCommand(&data, "holdoff", 1))
+        else if(isCommand(&data, "holdoff", 0))
         {
             if(data.fieldCount == 1)
                 holdoffVal = getFieldInteger(&data, 1);
             else
             {
-                snprintf(buffer, 64, "Invalid holdoff\nCurrent holdoff: %d", holdoffVal);
+                snprintf(buffer, 72, "Invalid holdoff\nCurrent holdoff: %d\n", holdoffVal);
                 putsUart0(buffer);
             }
         }
         else if(isCommand(&data, "aoa", 1))
         {
-            strTemp = getFieldString(&data, 2);
+            strTemp = getFieldString(&data, 0);
             if(strcmp1(strTemp, "ON"))
                 aoaOn = true;
             else if(strcmp1(strTemp, "OFF"))
@@ -347,12 +344,12 @@ int main()
         }
         else if(isCommand(&data, "aoa", 0))
         {
-            snprintf(buffer, 64, "aoa: %d\n\n", (int)degree);
+            snprintf(buffer, 72, "aoa: %d\n\n", (int)degree);
             putsUart0(buffer);
         }
         else if(isCommand(&data, "tdoa", 1))
         {
-            strTemp = getFieldString(&data, 2);
+            strTemp = getFieldString(&data, 0);
             if(strcmp1(strTemp, "ON"))
                 tdoaOn = true;
             else if(strcmp1(strTemp, "OFF"))
@@ -360,7 +357,7 @@ int main()
         }
         else if(isCommand(&data, "fail", 1))
         {
-            strTemp = getFieldString(&data, 2);
+            strTemp = getFieldString(&data, 0);
             if(strcmp1(strTemp, "ON"))
                 failOn = true;
             else if(strcmp1(strTemp, "OFF"))
