@@ -18,7 +18,7 @@ void setColor(float degree);
 #define AIN0 PORTE, 3
 #define AIN1 PORTE, 2
 #define AIN2 PORTE, 1
-#define temp 150
+#define temp 250
 
 uint16_t ain0Raw;
 uint16_t ain1Raw;
@@ -51,13 +51,13 @@ uint8_t value2;
 uint8_t section;
 uint8_t k;
 float degree;
-bool failOn = true;
+bool failOn = false;
 bool tdoaOn = false;
 
 uint16_t spike = temp;
 
 uint8_t index = 0;
-uint32_t backoff = 50;
+uint32_t backoff = 75;
 uint32_t timeConstant = 100;
 
 uint32_t holdoff = 0;
@@ -301,13 +301,15 @@ int main()
         {
             snprintf(buffer, 72, "Mic 0 average DAC: %d\nMic 1 average DAC: %d\nMic 2 average DAC: %d\n\n", ain0Average, ain1Average, ain2Average);
             putsUart0(buffer);
-            snprintf(buffer, 72, "Mic 0 average SPL: %d\nMic 1 average SPL: %d\nMic 2 average SPL: %d\n\n", (int)((float)ain0Average * (3300.0 / 4096.0) * .1384) + 94, (int)((float)ain1Average * (3300.0 / 4096.0) * .1384) + 94, (int)((float)ain2Average * (3300.0 / 4096.0) * .1384) + 94);
+            ain0Average = 0;
+            snprintf(buffer, 72, "Mic 0 average SPL: %d\nMic 1 average SPL: %d\nMic 2 average SPL: %d\n\n", (int)((20 * log10((float)(ain0Average + 1) * (3.3 / 4096.0))) + 138.0),
+                     (int)((20 * log10((float)(ain1Average + 1) * (3.3 / 4096.0))) + 138.0), (int)((20 * log10((float)(ain2Average + 1) * (3.3 / 4096.0))) + 138.0));
             putsUart0(buffer);
         }
         else if(isCommand(&data, "tc", 0))
         {
             if(data.fieldCount == 1)
-                timeConstant = getFieldInteger(&data, 1);
+                timeConstant = getFieldInteger(&data, 0);
             else
             {
                 snprintf(buffer, 72, "Invalid time constant\nCurrent time constant: %d\n", timeConstant);
@@ -317,7 +319,7 @@ int main()
         else if(isCommand(&data, "backoff", 0))
         {
             if(data.fieldCount == 1)
-                backoff = getFieldInteger(&data, 1);
+                backoff = getFieldInteger(&data, 0);
             else
             {
                 snprintf(buffer, 72, "Invalid backoff\nCurrent backoff: %d\n", backoff);
@@ -327,7 +329,7 @@ int main()
         else if(isCommand(&data, "holdoff", 0))
         {
             if(data.fieldCount == 1)
-                holdoffVal = getFieldInteger(&data, 1);
+                holdoffVal = getFieldInteger(&data, 0);
             else
             {
                 snprintf(buffer, 72, "Invalid holdoff\nCurrent holdoff: %d\n", holdoffVal);
